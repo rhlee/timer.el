@@ -19,10 +19,8 @@
   (setq timers (append timers (list (timer-new name)))))
 
 (defun timer-new (name)
-  (let ((timer (list
-      :name name
-      :time 0
-      :start nil)))
+  (let ((timer (make-hash-table)))
+    (puthash :name name timer)
     timer))
 
 (defun timer-quit()
@@ -30,7 +28,7 @@
   t)
 
 (defun timer-draw-button (timer)
-  (print (point))
+  (puthash :button (point) timer)
   (insert "hello\n"))
 
 (defun redraw-timers ()
