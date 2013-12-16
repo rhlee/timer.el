@@ -55,6 +55,11 @@
   (add-text-properties 3 8 '(face (:foreground "red")))
   (buffer-string)))
 
+(setq stop-button
+  (with-temp-buffer (insert-text-button "[ Stop  ]" 'face 'default)
+  (add-text-properties 3 8 '(face (:foreground "green")))
+  (buffer-string)))
+
 (timer)
 ;(insert (propertize "foo" 'face '(:foreground "red")))
 ;(with-temp-buffer)
@@ -65,4 +70,4 @@
 (new-timer "apple")
 (new-timer "bear")
 (redraw-timers)
-(insert (propertize start-button 'action (lambda (e) (print "p"))))
+(insert (propertize stop-button 'action (lambda (e) (print "p"))))
