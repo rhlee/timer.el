@@ -11,8 +11,6 @@
   (switch-to-buffer timer-buffer)
   (setq mode-name "Timer")
   (use-local-map timer-mode-map)
-  
-  (redraw-timers)
   (add-hook 'kill-buffer-query-functions 'timer-quit nil t))
 
 (defun new-timer (name)
@@ -52,6 +50,11 @@
   (goto-char (car marks))
   (delete-char (car (cdr marks))))
 
+(setq start-button
+  (with-temp-buffer (insert-text-button "[ Start ]" 'face 'default)
+  (add-text-properties 3 8 '(face (:foreground "red")))
+  (buffer-string)))
+
 (timer)
 ;(insert (propertize "foo" 'face '(:foreground "red")))
 ;(with-temp-buffer)
@@ -62,9 +65,4 @@
 (new-timer "apple")
 (new-timer "bear")
 (redraw-timers)
-(setq bp (insert-text-button "hello" 'action (lambda (e) (print "hello"))))
-(setq overwrite-mode overwrite-mode-textual)
-;(message (text-properties-at bp))
-(setq m (insert-and-mark "pineapple"))
-(goto-and-delete m)
-(insert "hi")
+(insert (propertize start-button 'action (lambda (e) (print "p"))))
