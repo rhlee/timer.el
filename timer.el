@@ -11,6 +11,7 @@
   (switch-to-buffer timer-buffer)
   (setq mode-name "Timer")
   (use-local-map timer-mode-map)
+  
   (redraw-timers)
   (add-hook 'kill-buffer-query-functions 'timer-quit nil t))
 
@@ -27,14 +28,29 @@
   (print "hello")
   t)
 
-(defun timer-draw-button (timer)
+(defun timer-redraw-button (timer)
   (puthash :button (point) timer)
-  (insert "hello\n"))
+  (insert (timer-get-button timer)))
+
+(defun timer-get-button (timer)
+  (concat
+    (propertize "[")
+    (propertize " Start ")
+    (propertize "]")))
 
 (defun redraw-timers ()
   (interactive)
   (dolist (timer timers)
-    (timer-draw-button timer)))
+    (timer-redraw-button timer)))
+
+(defun insert-and-mark (string)
+  (let ((start (point)))
+    (insert string)
+    (list start (length string))))
+
+(defun goto-and-delete (marks)
+  (goto-char (car marks))
+  (delete-char (car (cdr marks))))
 
 (timer)
 ;(insert (propertize "foo" 'face '(:foreground "red")))
@@ -46,3 +62,9 @@
 (new-timer "apple")
 (new-timer "bear")
 (redraw-timers)
+(setq bp (insert-text-button "hello" 'action (lambda (e) (print "hello"))))
+(setq overwrite-mode overwrite-mode-textual)
+;(message (text-properties-at bp))
+(setq m (insert-and-mark "pineapple"))
+(goto-and-delete m)
+(insert "hi")
