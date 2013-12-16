@@ -27,14 +27,8 @@
   t)
 
 (defun timer-redraw-button (timer)
-  (puthash :button (point) timer)
-  (insert (timer-get-button timer)))
-
-(defun timer-get-button (timer)
-  (concat
-    (propertize "[")
-    (propertize " Start ")
-    (propertize "]")))
+  (puthash :button (insert-and-mark start-button) timer)
+  (insert "\n"))
 
 (defun redraw-timers ()
   (interactive)
@@ -46,9 +40,17 @@
     (insert string)
     (list start (length string))))
 
-(defun goto-and-delete (marks)
-  (goto-char (car marks))
-  (delete-char (car (cdr marks))))
+;(defun goto-and-delete (marks)
+;  (goto-char (car marks))
+;  (delete-char (car (cdr marks))))
+
+(defun replace-marked (mark string)
+  (goto-char (car mark))
+  (delete-char (car (cdr mark)))
+  (if (not (eq (length string) (car (cdr mark))))
+    (error "Replacement string length does not match"))
+  (insert string))
+
 
 (setq start-button
   (with-temp-buffer (insert-text-button "[ Start ]" 'face 'default)
@@ -61,13 +63,11 @@
   (buffer-string)))
 
 (timer)
-;(insert (propertize "foo" 'face '(:foreground "red")))
-;(with-temp-buffer)
-;(insert (with-temp-buffer (insert-text-button "hello" 'action (lambda () nil))
-;  (buffer-string)))
-;(setq overwrite-mode overwrite-mode-textual)
+
 (new-timer "hello")
 (new-timer "apple")
 (new-timer "bear")
 (redraw-timers)
-(insert (propertize stop-button 'action (lambda (e) (print "p"))))
+
+(setq txt (insert-and-mark "hello"))
+(replace-marked txt "jelalo")
