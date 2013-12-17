@@ -49,13 +49,13 @@
 
 (defun redraw-timers ()
   (interactive)
-  (switch-to-buffer timer-buffer)
-  (erase-buffer)
-  (dolist (timer timers)
-    (timer-redraw-button timer t)
-    (insert " ")
-    (timer-redraw-display timer t)
-    (insert "\n")))
+  (with-current-buffer timer-buffer
+    (erase-buffer)
+    (dolist (timer timers)
+      (timer-redraw-button timer t)
+      (insert " ")
+      (timer-redraw-display timer t)
+      (insert "\n"))))
 
 (defun insert-and-mark (string)
   (let ((start (point)))
@@ -71,13 +71,16 @@
 
 (defun start-timer (timer)
   (puthash :start (float-time) timer)
-  (timer-redraw-button timer)
-  (timer-redraw-display timer)
+  (with-current-buffer timer-buffer
+    (timer-redraw-button timer)
+    (timer-redraw-display timer))
   (puthash :timer
     (run-at-time
       (- 1 (mod (gethash :time timer 0) 1))
       0.5
-      `(lambda () (timer-redraw-display ,timer)))
+      `(lambda ()
+        (with-current-buffer timer-buffer
+          (timer-redraw-display ,timer))))
     timer)
   )
 
@@ -87,8 +90,9 @@
       (gethash :time timer 0))
     timer)
   (puthash :start nil timer)
-  (timer-redraw-button timer)
-  (timer-redraw-display timer))
+  (with-current-buffer timer-buffer
+    (timer-redraw-button timer)
+    (timer-redraw-display timer)))
 
 (defun format-time (time)
   (let (
