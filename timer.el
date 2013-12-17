@@ -39,10 +39,9 @@
   (let* (
       (time (gethash :time timer 0))
       (start (gethash :start timer))
-      (display (format-time
-        (if start
-          (+ time (- (float-time) start))
-          time))))
+      (display (if start
+        (format-time (+ time (- (float-time) start)))
+        (format-time time t))))
     (if append
       (puthash :display (insert-and-mark display) timer)
       (replace-marked (gethash :display timer) display))))
@@ -95,12 +94,12 @@
     (timer-redraw-button timer)
     (timer-redraw-display timer)))
 
-(defun format-time (time)
+(defun format-time (time &optional stop)
   (let (
       (seconds (floor (mod time 60)))
       (minutes (mod (floor (/ time 60)) 60))
       (hours (floor (/ time 3600)))
-      (sep (if nil ":"
+      (sep (if stop ":"
         (if (< (mod time 1) 0.5) ":" " "))))
     (format (concat "%02d" sep "%02d" sep "%02d") hours minutes seconds)))
 
