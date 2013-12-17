@@ -33,15 +33,15 @@
         (propertize start-button 'action `(lambda (e) (start-timer ,timer))))))
   (if append
     (puthash :button (insert-and-mark button) timer)
-    )
-  (insert "\n")))
+    (replace-marked (gethash :button timer) button))))
 
 (defun redraw-timers ()
   (interactive)
   (switch-to-buffer timer-buffer)
   (erase-buffer)
   (dolist (timer timers)
-    (timer-redraw-button timer t)))
+    (timer-redraw-button timer t)
+    (insert "\n")))
 
 (defun insert-and-mark (string)
   (let ((start (point)))
@@ -58,6 +58,7 @@
 (defun start-timer (timer)
   (print (gethash :name timer))
   (puthash :start 0 timer)
+  (timer-redraw-button timer)
   )
 
 (defun stop-timer (timer)
