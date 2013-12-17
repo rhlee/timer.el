@@ -26,23 +26,25 @@
   (print "hello")
   t)
 
-(defun timer-redraw-button (timer)
-  (puthash :button (insert-and-mark start-button) timer)
-  (insert "\n"))
+(defun timer-redraw-button (timer &optional append)
+  (let
+      ((button (if (gethash :start timer)
+        (propertize stop-button 'action `(lambda (e) (stop-timer ,timer)))
+        (propertize start-button 'action `(lambda (e) (start-timer ,timer))))))
+  (if append
+    (puthash :button (insert-and-mark button) timer)
+    )
+  (insert "\n")))
 
 (defun redraw-timers ()
   (interactive)
   (dolist (timer timers)
-    (timer-redraw-button timer)))
+    (timer-redraw-button timer t)))
 
 (defun insert-and-mark (string)
   (let ((start (point)))
     (insert string)
     (list start (length string))))
-
-;(defun goto-and-delete (marks)
-;  (goto-char (car marks))
-;  (delete-char (car (cdr marks))))
 
 (defun replace-marked (mark string)
   (goto-char (car mark))
@@ -50,6 +52,12 @@
   (if (not (eq (length string) (car (cdr mark))))
     (error "Replacement string length does not match"))
   (insert string))
+
+(defun start-timer (timer)
+  (print "start"))
+
+(defun stop-timer (timer)
+  (print "stop"))
 
 
 (setq start-button
@@ -70,4 +78,4 @@
 (redraw-timers)
 
 (setq txt (insert-and-mark "hello"))
-(replace-marked txt "jelalo")
+(replace-marked txt "jlalo")
