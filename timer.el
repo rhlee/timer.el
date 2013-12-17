@@ -56,14 +56,12 @@
   (insert string))
 
 (defun start-timer (timer)
-  (print (gethash :name timer))
   (puthash :start 0 timer)
-  (timer-redraw-button timer)
-  )
+  (timer-redraw-button timer))
 
 (defun stop-timer (timer)
-  (print "stop"))
-
+  (puthash :start nil timer)
+  (timer-redraw-button timer))
 
 (setq start-button
   (with-temp-buffer (insert-text-button "[ Start ]" 'face 'default)
