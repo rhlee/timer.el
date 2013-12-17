@@ -76,7 +76,7 @@
     (timer-redraw-display timer))
   (puthash :timer
     (run-at-time
-      (- 1 (mod (gethash :time timer 0) 1))
+      (- 0.5 (mod (gethash :time timer 0) 0.5))
       0.5
       `(lambda ()
         (with-current-buffer timer-buffer
