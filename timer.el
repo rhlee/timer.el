@@ -96,10 +96,11 @@
 
 (defun format-time (time)
   (let (
-    (seconds (floor (mod time 60)))
-    (minutes (mod (floor (/ time 60)) 60))
-    (hours (floor (/ time 3600))))
-    (format "%02d:%02d:%02d" hours minutes seconds)))
+      (seconds (floor (mod time 60)))
+      (minutes (mod (floor (/ time 60)) 60))
+      (hours (floor (/ time 3600)))
+      (sep (if (< (mod time 1) 0.5) ":" " ")))
+    (format (concat "%02d" sep "%02d" sep "%02d") hours minutes seconds)))
 
 (setq start-button
   (with-temp-buffer (insert-text-button "[ Start ]" 'face 'default)
