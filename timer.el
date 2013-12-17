@@ -35,12 +35,26 @@
     (puthash :button (insert-and-mark button) timer)
     (replace-marked (gethash :button timer) button))))
 
+(defun timer-redraw-display (timer &optional append)
+  (let* (
+      (time (gethash :time timer 0))
+      (start (gethash :start timer))
+      (display (format-time
+        (if start
+          (+ time (- (float-time) start))
+          time))))
+    (if append
+      (puthash :display (insert-and-mark display) timer)
+      (replace-marked (gethash :display timer) display))))
+
 (defun redraw-timers ()
   (interactive)
   (switch-to-buffer timer-buffer)
   (erase-buffer)
   (dolist (timer timers)
     (timer-redraw-button timer t)
+    (insert " ")
+    (timer-redraw-display timer t)
     (insert "\n")))
 
 (defun insert-and-mark (string)
@@ -67,6 +81,13 @@
   (puthash :start nil timer)
   (timer-redraw-button timer))
 
+(defun format-time (time)
+  (let (
+    (seconds (floor (mod time 60)))
+    (minutes (mod (floor (/ time 60)) 60))
+    (hours (floor (/ time 3600))))
+    (format "%02d:%02d:%02d" hours minutes seconds)))
+
 (setq start-button
   (with-temp-buffer (insert-text-button "[ Start ]" 'face 'default)
   (add-text-properties 3 8 '(face (:foreground "red")))
@@ -83,3 +104,5 @@
 (new-timer "apple")
 (new-timer "bear")
 (redraw-timers)
+
+(insert (format-time 10000))
