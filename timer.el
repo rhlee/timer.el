@@ -54,7 +54,10 @@
       (timer-redraw-button timer t)
       (insert " ")
       (timer-redraw-display timer t)
-      (insert "\n"))))
+      (insert " ")
+      (insert (gethash :name timer))
+      (insert "\n"))
+    (goto-char (point-max))))
 
 (defun insert-and-mark (string)
   (let ((start (point)))
@@ -72,16 +75,17 @@
   (puthash :start (float-time) timer)
   (with-current-buffer timer-buffer
     (timer-redraw-button timer)
-    (timer-redraw-display timer))
+    (timer-redraw-display timer)
+    (goto-char (point-max)))
   (puthash :timer
     (run-at-time
       (- 0.5 (mod (gethash :time timer 0) 0.5))
       0.5
       `(lambda ()
         (with-current-buffer timer-buffer
-          (timer-redraw-display ,timer))))
-    timer)
-  )
+          (timer-redraw-display ,timer)
+          (goto-char (point-max)))))
+    timer))
 
 (defun stop-timer (timer)
   (puthash :time (+
@@ -92,7 +96,8 @@
   (cancel-timer (gethash :timer timer))
   (with-current-buffer timer-buffer
     (timer-redraw-button timer)
-    (timer-redraw-display timer)))
+    (timer-redraw-display timer)
+    (goto-char (point-max))))
 
 (defun format-time (time &optional stop)
   (let (
