@@ -38,6 +38,8 @@
 
 (defun redraw-timers ()
   (interactive)
+  (switch-to-buffer timer-buffer)
+  (erase-buffer)
   (dolist (timer timers)
     (timer-redraw-button timer t)))
 
@@ -54,7 +56,9 @@
   (insert string))
 
 (defun start-timer (timer)
-  (print "start"))
+  (print (gethash :name timer))
+  (puthash :start 0 timer)
+  )
 
 (defun stop-timer (timer)
   (print "stop"))
