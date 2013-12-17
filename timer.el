@@ -90,6 +90,7 @@
       (gethash :time timer 0))
     timer)
   (puthash :start nil timer)
+  (cancel-timer (gethash :timer timer))
   (with-current-buffer timer-buffer
     (timer-redraw-button timer)
     (timer-redraw-display timer)))
@@ -99,7 +100,8 @@
       (seconds (floor (mod time 60)))
       (minutes (mod (floor (/ time 60)) 60))
       (hours (floor (/ time 3600)))
-      (sep (if (< (mod time 1) 0.5) ":" " ")))
+      (sep (if nil ":"
+        (if (< (mod time 1) 0.5) ":" " "))))
     (format (concat "%02d" sep "%02d" sep "%02d") hours minutes seconds)))
 
 (setq start-button
