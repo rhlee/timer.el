@@ -71,7 +71,15 @@
 
 (defun start-timer (timer)
   (puthash :start (float-time) timer)
-  (timer-redraw-button timer))
+  (timer-redraw-button timer)
+  (timer-redraw-display timer)
+  (puthash :timer
+    (run-at-time
+      (- 1 (mod (gethash :time timer 0) 1))
+      0.5
+      `(lambda () (timer-redraw-display ,timer)))
+    timer)
+  )
 
 (defun stop-timer (timer)
   (puthash :time (+
@@ -79,7 +87,8 @@
       (gethash :time timer 0))
     timer)
   (puthash :start nil timer)
-  (timer-redraw-button timer))
+  (timer-redraw-button timer)
+  (timer-redraw-display timer))
 
 (defun format-time (time)
   (let (
@@ -104,5 +113,3 @@
 (new-timer "apple")
 (new-timer "bear")
 (redraw-timers)
-
-(insert (format-time 10000))
