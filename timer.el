@@ -56,10 +56,14 @@
   (insert string))
 
 (defun start-timer (timer)
-  (puthash :start 0 timer)
+  (puthash :start (float-time) timer)
   (timer-redraw-button timer))
 
 (defun stop-timer (timer)
+  (puthash :time (+
+      (- (float-time) (gethash :start timer))
+      (gethash :time timer 0))
+    timer)
   (puthash :start nil timer)
   (timer-redraw-button timer))
 
@@ -79,6 +83,3 @@
 (new-timer "apple")
 (new-timer "bear")
 (redraw-timers)
-
-(setq txt (insert-and-mark "hello"))
-(replace-marked txt "jlalo")
