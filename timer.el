@@ -10,7 +10,12 @@
   (setq timer-buffer (generate-new-buffer "timer"))
   (switch-to-buffer timer-buffer)
   (setq mode-name "Timer")
-  (use-local-map timer-mode-map))
+  (use-local-map timer-mode-map)
+  (if (not (boundp 'timer-autosave))
+    (setq timer-autosave
+      (run-at-time 60 60 (lambda () (save-timers timers))))))
+
+;;kill running timers
 
 (defun new-timer (name)
   (interactive "sname: ")
@@ -104,31 +109,28 @@
     (format (concat "%02d" sep "%02d" sep "%02d") hours minutes seconds)))
 
 (defun save-timers (timers)
-  (interactive)
-  (message (prin1-to-string
-  (let (strippeds)
-  (dolist (timer timers strippeds)
-    (let (
-        (stripped (make-hash-table))
-        (start (gethash :start timer))
-        )
-      (puthash :name (gethash :name timer) stripped)
-      (puthash :time (+
-          (gethash :time timer 0)
-          (if start (- (float-time) start) 0))
-        stripped)
-      (setq strippeds
-        (append strippeds (list stripped)))))
-      )))
-;  (with-temp-file "~/timers"
-;    (prin1 timers (current-buffer)))
-    )
+  (with-temp-file "~/timers"
+    (prin1
+      (let (strippeds)
+        (dolist (timer timers strippeds)
+          (let (
+              (stripped (make-hash-table))
+              (start (gethash :start timer)))
+            (puthash :name (gethash :name timer) stripped)
+            (puthash :time (+
+                (gethash :time timer 0)
+                (if start (- (float-time) start) 0))
+              stripped)
+            (setq strippeds
+              (append strippeds (list stripped))))))
+      (current-buffer))))
 
 (defun load-timers ()
    (interactive)
    (let ((buffer (find-file-noselect "~/timers")))
-     (read buffer)
-     (kill-buffer buffer)))
+     (setq timers (read buffer))
+     (kill-buffer buffer))
+   (redraw-timers))
 
 (setq start-button
   (with-temp-buffer (insert-text-button "[ Start ]" 'face 'default)
