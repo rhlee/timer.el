@@ -132,7 +132,7 @@
      (kill-buffer buffer))
    (redraw-timers))
 
-(defun adjust-timers (timer minutes)
+(defun adjust-timer (timer minutes)
   (setq edebug-on-error t)
   (interactive (list
     (let ((timer-list (mapcar (lambda (timer) (gethash :name timer)) timers)))
@@ -142,19 +142,30 @@
           (length
             (member (completing-read "Select timer: " timer-list) timer-list)))
         timers))
-    (read-from-minibuffer "Minutes:")))
+    (read-from-minibuffer "Minutes: ")))
   (if (string-match "^\\(?1:[+-]\\)?\\(?2:[[:digit:]]+\\)$" minutes)
-    (let (
-        (sign (match-string 1 minutes))
-        (number (string-to-int (match-string 2 minutes))))
-      (puthash :time
-        (max
-          0
-          (if sign
-            (funcall (intern sign) (gethash :time timer) number)
-            number))
-        timer)))
-  (print timer))
+    (progn
+      (let (
+          (sign (match-string 1 minutes))
+          (number (* (string-to-int (match-string 2 minutes)) 60))
+          (start (gethash :start timer)))
+        (puthash :time
+          (max
+            0
+            (if sign
+              (funcall (intern sign)
+                (+
+                  (gethash :time timer 0)
+                  (if start
+                    (let ((float-time-now (float-time)))
+                      (puthash :start float-time-now timer)
+                      (- float-time-now start))))
+                number)
+              number))
+          timer)))
+     (error
+       "Please match enter a whole number, optionally prefixed by a sign."))
+  (redraw-timers))
     
 
 (setq start-button
