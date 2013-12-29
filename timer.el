@@ -134,11 +134,16 @@
 
 (defun adjust-timers (timer minutes)
   (interactive (list
-    (completing-read "Select timer: "
-      (mapcar (lambda (timer) (gethash :name timer)) timers))
-    (read-from-minibuffer "Minutes:"))))
-  ;((interactive "sMinutes: ")))
-  ;(if (string-match "^\\([+-]?\\)\\([[:digit:]]+\\)$" ))
+    (let ((timer-list (mapcar (lambda (timer) (gethash :name timer)) timers)))
+      (nth
+        (- (length timer-list)
+          (length (member (completing-read "Select timer: " timer-list) timer-list)))
+        timers))
+    (read-from-minibuffer "Minutes:")))
+  (if (string-match "^\\(?1:[+-]\\)?\\(?2:[[:digit:]]+\\)$" minutes)
+    (progn))
+  (print timer))
+    
 
 (setq start-button
   (with-temp-buffer (insert-text-button "[ Start ]" 'face 'default)
