@@ -132,6 +132,14 @@
      (kill-buffer buffer))
    (redraw-timers))
 
+(defun adjust-timers (timer minutes)
+  (interactive (list
+    (completing-read "Select timer: "
+      (mapcar (lambda (timer) (gethash :name timer)) timers))
+    (read-from-minibuffer "Minutes:"))))
+  ;((interactive "sMinutes: ")))
+  ;(if (string-match "^\\([+-]?\\)\\([[:digit:]]+\\)$" ))
+
 (setq start-button
   (with-temp-buffer (insert-text-button "[ Start ]" 'face 'default)
   (add-text-properties 3 8 '(face (:foreground "red")))
