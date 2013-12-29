@@ -136,12 +136,23 @@
   (interactive (list
     (let ((timer-list (mapcar (lambda (timer) (gethash :name timer)) timers)))
       (nth
-        (- (length timer-list)
-          (length (member (completing-read "Select timer: " timer-list) timer-list)))
+        (-
+          (length timer-list)
+          (length
+            (member (completing-read "Select timer: " timer-list) timer-list)))
         timers))
     (read-from-minibuffer "Minutes:")))
+  (edebug)
   (if (string-match "^\\(?1:[+-]\\)?\\(?2:[[:digit:]]+\\)$" minutes)
-    (progn))
+    (let (
+        (sign (intern (match-string 1 minutes)))
+        (number (string-to-int (match-string 2 minutes))))
+      (puthash :time
+        (max
+          (0
+          (if sign
+            (funcall sign (gethash :time timer) number)
+            (number)))))))
   (print timer))
     
 
