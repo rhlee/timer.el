@@ -159,7 +159,8 @@
                   (if start
                     (let ((float-time-now (float-time)))
                       (puthash :start float-time-now timer)
-                      (- float-time-now start))))
+                      (- float-time-now start))
+                    0))
                 number)
               number))
           timer)))
