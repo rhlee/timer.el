@@ -7,7 +7,8 @@
 
 (defun timer ()
   (interactive)
-  (setq timer-buffer (generate-new-buffer "timer"))
+  (if (not timer-buffer)
+    (setq timer-buffer (generate-new-buffer "timer")))
   (switch-to-buffer timer-buffer)
   (setq mode-name "Timer")
   (use-local-map timer-mode-map)
