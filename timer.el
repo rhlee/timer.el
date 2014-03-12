@@ -7,8 +7,10 @@
 
 (defun timer ()
   (interactive)
-  (if (not timer-buffer)
-    (setq timer-buffer (generate-new-buffer "timer")))
+  (if (or
+    (not timer-buffer)
+    (not (buffer-name timer-buffer)))
+      (setq timer-buffer (generate-new-buffer "timer")))
   (switch-to-buffer timer-buffer)
   (setq mode-name "Timer")
   (use-local-map timer-mode-map)
