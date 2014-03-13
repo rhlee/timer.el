@@ -14,13 +14,11 @@
   (switch-to-buffer timer-buffer)
   (setq mode-name "Timer")
   (use-local-map timer-mode-map)
-  (if (not (boundp 'timer-autosave))
+  (if (not (boundp 'timer-autosave)) ;;cancel this
     (setq timer-autosave
       (run-at-time 60 60 (lambda () (save-timers timers)))))
   (if (and timers (> (length timers) 0))
     (redraw-timers)))
-
-;;kill running timers
 
 (defun new-timer (name)
   (interactive "sname: ")
