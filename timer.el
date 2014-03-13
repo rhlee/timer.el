@@ -22,7 +22,9 @@
 
 (defun new-timer (name)
   (interactive "sname: ")
-  (setq timers (append timers (list (timer-new name)))))
+  (setq timers (append timers (list (timer-new name))))
+  (if (called-interactively-p 'any)
+    (redraw-timers)))
 
 (defun timer-new (name)
   (let ((timer (make-hash-table)))
