@@ -1,6 +1,7 @@
 (setq timer-buffer nil)
 (setq timers nil)
 (setq timer-next-id -1)
+(setq timer-save-file "~/timers")
 
 (defvar timer-mode-map (make-sparse-keymap) "timer mode keymap")
 (define-key timer-mode-map [follow-link] 'mouse-face)
@@ -114,7 +115,7 @@
     (format (concat "%02d" sep "%02d" sep "%02d") hours minutes seconds)))
 
 (defun save-timers (timers)
-  (with-temp-file "~/timers"
+  (with-temp-file timer-save-file
     (prin1
       (let (strippeds)
         (dolist (timer timers strippeds)
@@ -132,7 +133,7 @@
 
 (defun load-timers ()
    (interactive)
-   (let ((buffer (find-file-noselect "~/timers")))
+   (let ((buffer (find-file-noselect timer-save-file)))
      (setq timers (read buffer))
      (kill-buffer buffer))
    (redraw-timers))
