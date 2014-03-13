@@ -188,9 +188,12 @@
 (add-hook 'kill-buffer-hook
   (lambda ()
     (if (eq (current-buffer) timer-buffer)
-      (dolist (timer timers)
-        (if (gethash :start timer)
-          (stop-timer timer))))))
+      (progn
+        (dolist (timer timers)
+          (if (gethash :start timer)
+            (stop-timer timer)))
+        (cancel-timer timer-autosave)
+        (setq timer-autosave nil)))))
 
 (timer)
 
