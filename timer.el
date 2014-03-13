@@ -182,6 +182,14 @@
   (add-text-properties 3 8 '(face (:foreground "green")))
   (buffer-string)))
 
+
+(add-hook 'kill-buffer-hook
+  (lambda ()
+    (if (eq (current-buffer) timer-buffer)
+      (dolist (timer timers)
+        (if (gethash :start timer)
+          (stop-timer timer))))))
+
 (timer)
 
 (new-timer "hello")
