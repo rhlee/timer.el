@@ -15,6 +15,17 @@
   (switch-to-buffer timer-buffer)
   (setq mode-name "Timer")
   (use-local-map timer-mode-map)
+  (if (and
+    (file-exists-p timer-save-file)
+    (<
+      (let (
+          (now (current-time))
+          (file-time (nth 5 (file-attributes "~/timers"))))
+        (+
+          (* (- (pop now) (pop file-time)) (expt 2 16))
+          (- (car now) (car file-time))))
+      3600))
+      (message "save file deteced"))
   (if (not (boundp 'timer-autosave))
     (setq timer-autosave
       (run-at-time 60 60 (lambda () (save-timers timers)))))
