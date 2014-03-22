@@ -227,8 +227,3 @@
         (setq timer-autosave nil)))))
 
 (timer)
-
-(new-timer "hello")
-(new-timer "apple")
-(new-timer "bear")
-(redraw-timers)
