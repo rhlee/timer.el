@@ -24,8 +24,27 @@
         (+
           (* (- (pop now) (pop file-time)) (expt 2 16))
           (- (car now) (car file-time))))
-      3600))
-      (message "save file deteced"))
+      3600)
+    (let* (
+        (prompt "Load timers (Y/n)?")
+        (repromt (concat "Invalid response. " prompt))
+        (response) (result) (lowercase))
+      (while
+        (progn
+          (setq response (read-string prompt))
+          (setq prompt repromt)
+          (setq lowercase (downcase response))
+          (cond
+            ((member lowercase '("" "y"))
+              (setq result t)
+              nil)
+            ((equal lowercase "n")
+              (setq result nil)
+              nil)
+            (t t)))
+        nil)
+      result))
+    (load-timers))
   (if (not (boundp 'timer-autosave))
     (setq timer-autosave
       (run-at-time 60 60 (lambda () (save-timers timers)))))
