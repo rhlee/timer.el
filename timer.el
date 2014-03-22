@@ -26,7 +26,7 @@
           (- (car now) (car file-time))))
       3600)
     (let* (
-        (prompt "Load timers (Y/n)?")
+        (prompt "Load timers (Y/n)? ")
         (repromt (concat "Invalid response. " prompt))
         (response) (result) (lowercase))
       (while
