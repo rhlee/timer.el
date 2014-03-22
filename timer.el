@@ -112,8 +112,7 @@
   (puthash :start (float-time) timer)
   (with-current-buffer timer-buffer
     (timer-redraw-button timer)
-    (timer-redraw-display timer)
-    (goto-char (point-max)))
+    (timer-redraw-display timer))
   (puthash :timer
     (run-at-time
       (- 0.5 (mod (gethash :time timer 0) 0.5))
@@ -132,8 +131,7 @@
   (cancel-timer (gethash :timer timer))
   (with-current-buffer timer-buffer
     (timer-redraw-button timer)
-    (timer-redraw-display timer)
-    (goto-char (point-max))))
+    (timer-redraw-display timer)))
 
 (defun format-time (time &optional stop)
   (let (
