@@ -101,11 +101,12 @@
     (list start (length string))))
 
 (defun replace-marked (mark string)
-  (goto-char (car mark))
-  (delete-char (car (cdr mark)))
-  (if (not (eq (length string) (car (cdr mark))))
-    (error "Replacement string length does not match"))
-  (insert string))
+  (save-excursion
+    (goto-char (car mark))
+    (delete-char (car (cdr mark)))
+    (if (not (eq (length string) (car (cdr mark))))
+      (error "Replacement string length does not match"))
+    (insert string)))
 
 (defun start-timer (timer)
   (puthash :start (float-time) timer)
@@ -119,8 +120,7 @@
       0.5
       `(lambda ()
         (with-current-buffer timer-buffer
-          (timer-redraw-display ,timer)
-          (goto-char (point-max)))))
+          (timer-redraw-display ,timer))))
     timer))
 
 (defun stop-timer (timer)
