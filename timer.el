@@ -101,13 +101,14 @@
     (list start (length string))))
 
 (defun replace-marked (mark string)
-  (save-excursion
+  (let ((position (point)))
     (goto-char (car mark))
     (delete-char (car (cdr mark)))
     (if (not (eq (length string) (car (cdr mark))))
       (error "Replacement string length does not match"))
-    (insert string)))
-
+    (insert string)
+    (goto-char position)))
+  
 (defun start-timer (timer)
   (puthash :start (float-time) timer)
   (with-current-buffer timer-buffer
