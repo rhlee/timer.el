@@ -223,5 +223,3 @@
             (stop-timer timer)))
         (cancel-timer timer-autosave)
         (setq timer-autosave nil)))))
-
-(timer)
