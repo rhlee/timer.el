@@ -168,7 +168,6 @@
    (redraw-timers))
 
 (defun adjust-timer (timer minutes)
-  (setq edebug-on-error t)
   (interactive (list
     (let ((timer-list (mapcar (lambda (timer) (gethash :name timer)) timers)))
       (nth
