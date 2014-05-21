@@ -174,13 +174,22 @@
 (defun adjust-timer (timer minutes)
   (setq edebug-on-error t)
   (interactive (list
-    (let ((timer-list (mapcar (lambda (timer) (gethash :name timer)) timers)))
-      (nth
-        (-
-          (length timer-list)
-          (length
-            (member (completing-read "Select timer: " timer-list) timer-list)))
-        timers))
+    ;; (let ((timer-list (mapcar (lambda (timer) (gethash :name timer)) timers)))
+    ;;   (nth
+    ;;     (-
+    ;;       (length timer-list)
+    ;;       (length
+    ;;         (member (completing-read "Select timer: " timer-list) timer-list)))
+    ;;     timers))
+    (let ((timer-names nil))
+      (maphash
+        (lambda (name timer)
+          (let ((singleton (cons name nil)))
+          (if timer-names
+            (nconc timer-names singleton)
+            (setf timer-names singleton)))) 
+        timers)
+      (gethash (completing-read "Select timer: " timer-names) timers))
     (read-from-minibuffer "Minutes: ")))
   (if (string-match "^\\(?1:[+-]\\)?\\(?2:[[:digit:]]+\\)$" minutes)
     (progn
