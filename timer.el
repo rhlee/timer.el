@@ -53,14 +53,14 @@
 
 (defun new-timer (name)
   (interactive "sname: ")
-  (setq timers (append timers (list (timer-new name))))
+  (puthash name (make-hash-table) timers)
   (if (called-interactively-p 'any)
     (redraw-timers)))
 
-(defun timer-new (name)
-  (let ((timer (make-hash-table)))
-    (puthash :name name timer)
-    timer))
+;; (defun timer-new (name)
+;;   (let ((timer (make-hash-table)))
+;;     (puthash :name name timer)
+;;     timer))
 
 (defun timer-redraw-button (timer &optional append)
   (let
