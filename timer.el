@@ -148,18 +148,20 @@
 (defun save-timers (timers)
   (with-temp-file timer-save-file
     (prin1
-      (let (strippeds)
-        (dolist (timer timers strippeds)
-          (let (
-              (stripped (make-hash-table))
-              (start (gethash :start timer)))
-            (puthash :name (gethash :name timer) stripped)
-            (puthash :time (+
-                (gethash :time timer 0)
-                (if start (- (float-time) start) 0))
-              stripped)
-            (setq strippeds
-              (append strippeds (list stripped))))))
+      (let ((save-hashes (make-hash-table)))
+        (maphash
+          (lambda (name timer)
+            (let
+              ((save-hash (make-hash-table))
+                (start (gethash :start timer)))
+              (puthash :name (gethash :name timer) save-hash)
+              (puthash :time (+
+                  (gethash :time timer 0)
+                  (if start (- (float-time) start) 0))
+                save-hash)
+              (puthash name save-hash save-hashes)))
+          timers)
+         save-hashes)
       (current-buffer))))
 
 (defun load-timers ()
