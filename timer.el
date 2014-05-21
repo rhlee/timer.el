@@ -226,3 +226,7 @@
             (stop-timer timer)))
         (cancel-timer timer-autosave)
         (setq timer-autosave nil)))))
+
+
+;; TODO add with existing name
+;; timers (functional)
