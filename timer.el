@@ -1,5 +1,5 @@
 (setq timer-buffer nil)
-(setq timers (make-hash-table))
+(setq timers (make-hash-table :test 'equal))
 (setq timer-next-id -1)
 (setq timer-save-file "~/timers")
 
