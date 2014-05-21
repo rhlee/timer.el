@@ -48,7 +48,7 @@
   (if (not (boundp 'timer-autosave))
     (setq timer-autosave
       (run-at-time 60 60 (lambda () (save-timers timers)))))
-  (if (and timers (> (length timers) 0))
+  (if (and timers (> (hash-table-count timers) 0))
     (redraw-timers)))
 
 (defun new-timer (name)
