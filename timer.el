@@ -240,4 +240,4 @@
 
 
 ;; TODO add with existing name
-;; timers (functional)
+;; remove (+ stop)
