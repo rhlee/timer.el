@@ -86,13 +86,15 @@
   (interactive)
   (with-current-buffer timer-buffer
     (erase-buffer)
-    (dolist (timer timers)
-      (timer-redraw-button timer t)
-      (insert " ")
-      (timer-redraw-display timer t)
-      (insert " ")
-      (insert (propertize (gethash :name timer) 'face 'bold))
-      (insert "\n"))
+    (maphash
+      (lambda (name timer)
+        (timer-redraw-button timer t)
+        (insert " ")
+        (timer-redraw-display timer t)
+        (insert " ")
+        (insert (propertize name 'face 'bold))
+        (insert "\n"))
+      timers)
     (goto-char (point-max))))
 
 (defun insert-and-mark (string)
