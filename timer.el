@@ -68,11 +68,6 @@
   (remhash timer-name timers)
   (redraw-timers))
 
-;; (defun timer-new (name)
-;;   (let ((timer (make-hash-table)))
-;;     (puthash :name name timer)
-;;     timer))
-
 (defun timer-redraw-button (timer &optional append)
   (let
       ((button (if (gethash :start timer)
@@ -197,13 +192,6 @@
 (defun adjust-timer (timer minutes)
   (setq edebug-on-error t)
   (interactive (list
-    ;; (let ((timer-list (mapcar (lambda (timer) (gethash :name timer)) timers)))
-    ;;   (nth
-    ;;     (-
-    ;;       (length timer-list)
-    ;;       (length
-    ;;         (member (completing-read "Select timer: " timer-list) timer-list)))
-    ;;     timers))
     (gethash (pick-timer-name) timers)
     (read-from-minibuffer "Minutes: ")))
   (if (string-match "^\\(?1:[+-]\\)?\\(?2:[[:digit:]]+\\)$" minutes)
@@ -230,7 +218,7 @@
      (error
        "Please match enter a whole number, optionally prefixed by a sign."))
   (redraw-timers))
-    
+
 
 (setq start-button
   (with-temp-buffer (insert-text-button "[ Start ]" 'face 'default)
@@ -252,7 +240,3 @@
             (stop-timer timer)))
         (cancel-timer timer-autosave)
         (setq timer-autosave nil)))))
-
-
-;; TODO add with existing name
-;; remove (+ stop)
