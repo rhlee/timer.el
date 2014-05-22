@@ -1,5 +1,5 @@
 (setq timer-buffer nil)
-(setq timers nil)
+(setq timers (make-hash-table :test 'equal))
 (setq timer-next-id -1)
 (setq timer-save-file "~/timers")
 
@@ -48,19 +48,25 @@
   (if (not (boundp 'timer-autosave))
     (setq timer-autosave
       (run-at-time 60 60 (lambda () (save-timers timers)))))
-  (if (and timers (> (length timers) 0))
+  (if (and timers (> (hash-table-count timers) 0))
     (redraw-timers)))
 
 (defun new-timer (name)
   (interactive "sname: ")
-  (setq timers (append timers (list (timer-new name))))
-  (if (called-interactively-p 'any)
-    (redraw-timers)))
+  (if (gethash name timers)
+    (message "Timer with that name already exists")
+    (progn
+      (puthash name (make-hash-table) timers)
+      (redraw-timers))))
 
-(defun timer-new (name)
-  (let ((timer (make-hash-table)))
-    (puthash :name name timer)
-    timer))
+(defun remove-timer (timer-name)
+  (interactive (list (pick-timer-name)))
+  (let* (
+      (timer (gethash timer-name timers))
+      (timer-timer (gethash :timer timer)))
+    (if timer-timer (cancel-timer timer-timer)))
+  (remhash timer-name timers)
+  (redraw-timers))
 
 (defun timer-redraw-button (timer &optional append)
   (let
@@ -86,13 +92,15 @@
   (interactive)
   (with-current-buffer timer-buffer
     (erase-buffer)
-    (dolist (timer timers)
-      (timer-redraw-button timer t)
-      (insert " ")
-      (timer-redraw-display timer t)
-      (insert " ")
-      (insert (propertize (gethash :name timer) 'face 'bold))
-      (insert "\n"))
+    (maphash
+      (lambda (name timer)
+        (timer-redraw-button timer t)
+        (insert " ")
+        (timer-redraw-display timer t)
+        (insert " ")
+        (insert (propertize name 'face 'bold))
+        (insert "\n"))
+      timers)
     (goto-char (point-max))))
 
 (defun insert-and-mark (string)
@@ -130,6 +138,7 @@
     timer)
   (puthash :start nil timer)
   (cancel-timer (gethash :timer timer))
+  (puthash :timer nil timer)
   (with-current-buffer timer-buffer
     (timer-redraw-button timer)
     (timer-redraw-display timer)))
@@ -146,18 +155,20 @@
 (defun save-timers (timers)
   (with-temp-file timer-save-file
     (prin1
-      (let (strippeds)
-        (dolist (timer timers strippeds)
-          (let (
-              (stripped (make-hash-table))
-              (start (gethash :start timer)))
-            (puthash :name (gethash :name timer) stripped)
-            (puthash :time (+
-                (gethash :time timer 0)
-                (if start (- (float-time) start) 0))
-              stripped)
-            (setq strippeds
-              (append strippeds (list stripped))))))
+      (let ((save-hashes (make-hash-table :test 'equal)))
+        (maphash
+          (lambda (name timer)
+            (let
+              ((save-hash (make-hash-table))
+                (start (gethash :start timer)))
+              (puthash :name (gethash :name timer) save-hash)
+              (puthash :time (+
+                  (gethash :time timer 0)
+                  (if start (- (float-time) start) 0))
+                save-hash)
+              (puthash name save-hash save-hashes)))
+          timers)
+         save-hashes)
       (current-buffer))))
 
 (defun load-timers ()
@@ -167,15 +178,20 @@
      (kill-buffer buffer))
    (redraw-timers))
 
+(defun pick-timer-name ()
+  (let ((timer-names nil))
+    (maphash
+      (lambda (name timer)
+        (let ((singleton (cons name nil)))
+        (if timer-names
+          (nconc timer-names singleton)
+          (setf timer-names singleton)))) 
+      timers)
+    (completing-read "Select timer: " timer-names)))
+
 (defun adjust-timer (timer minutes)
   (interactive (list
-    (let ((timer-list (mapcar (lambda (timer) (gethash :name timer)) timers)))
-      (nth
-        (-
-          (length timer-list)
-          (length
-            (member (completing-read "Select timer: " timer-list) timer-list)))
-        timers))
+    (gethash (pick-timer-name) timers)
     (read-from-minibuffer "Minutes: ")))
   (if (string-match "^\\(?1:[+-]\\)?\\(?2:[[:digit:]]+\\)$" minutes)
     (progn
@@ -201,7 +217,7 @@
      (error
        "Please match enter a whole number, optionally prefixed by a sign."))
   (redraw-timers))
-    
+
 
 (setq start-button
   (with-temp-buffer (insert-text-button "[ Start ]" 'face 'default)
