@@ -148,7 +148,7 @@
 (defun save-timers (timers)
   (with-temp-file timer-save-file
     (prin1
-      (let ((save-hashes (make-hash-table)))
+      (let ((save-hashes (make-hash-table :test 'equal)))
         (maphash
           (lambda (name timer)
             (let
