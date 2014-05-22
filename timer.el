@@ -53,9 +53,11 @@
 
 (defun new-timer (name)
   (interactive "sname: ")
-  (puthash name (make-hash-table) timers)
-  (if (called-interactively-p 'any)
-    (redraw-timers)))
+  (if (gethash name timers)
+    (message "Timer with that name already exists")
+    (progn
+      (puthash name (make-hash-table) timers)
+      (redraw-timers))))
 
 (defun remove-timer (timer-name)
   (interactive (list (pick-timer-name)))
