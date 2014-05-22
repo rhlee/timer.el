@@ -57,6 +57,15 @@
   (if (called-interactively-p 'any)
     (redraw-timers)))
 
+(defun remove-timer (timer-name)
+  (interactive (list (pick-timer-name)))
+  (let* (
+      (timer (gethash timer-name timers))
+      (timer-timer (gethash :timer timer)))
+    (if timer-timer (cancel-timer timer-timer)))
+  (remhash timer-name timers)
+  (redraw-timers))
+
 ;; (defun timer-new (name)
 ;;   (let ((timer (make-hash-table)))
 ;;     (puthash :name name timer)
@@ -132,6 +141,7 @@
     timer)
   (puthash :start nil timer)
   (cancel-timer (gethash :timer timer))
+  (puthash :timer nil timer)
   (with-current-buffer timer-buffer
     (timer-redraw-button timer)
     (timer-redraw-display timer)))
@@ -171,6 +181,17 @@
      (kill-buffer buffer))
    (redraw-timers))
 
+(defun pick-timer-name ()
+  (let ((timer-names nil))
+    (maphash
+      (lambda (name timer)
+        (let ((singleton (cons name nil)))
+        (if timer-names
+          (nconc timer-names singleton)
+          (setf timer-names singleton)))) 
+      timers)
+    (completing-read "Select timer: " timer-names)))
+
 (defun adjust-timer (timer minutes)
   (setq edebug-on-error t)
   (interactive (list
@@ -181,15 +202,7 @@
     ;;       (length
     ;;         (member (completing-read "Select timer: " timer-list) timer-list)))
     ;;     timers))
-    (let ((timer-names nil))
-      (maphash
-        (lambda (name timer)
-          (let ((singleton (cons name nil)))
-          (if timer-names
-            (nconc timer-names singleton)
-            (setf timer-names singleton)))) 
-        timers)
-      (gethash (completing-read "Select timer: " timer-names) timers))
+    (gethash (pick-timer-name) timers)
     (read-from-minibuffer "Minutes: ")))
   (if (string-match "^\\(?1:[+-]\\)?\\(?2:[[:digit:]]+\\)$" minutes)
     (progn
