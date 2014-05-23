@@ -230,12 +230,17 @@
   (buffer-string)))
 
 
-(add-hook 'kill-buffer-hook
-  (lambda ()
-    (if (eq (current-buffer) timer-buffer)
-      (progn
-        (dolist (timer timers)
+(defun save-before-kill ()
+  (if (eq (current-buffer) timer-buffer)
+    (progn
+      (maphash
+        (lambda (name timer)
           (if (gethash :start timer)
             (stop-timer timer)))
-        (cancel-timer timer-autosave)
-        (setq timer-autosave nil)))))
+        timers)
+      (save-timers timers)
+      (cancel-timer timer-autosave)
+      (setq timer-autosave nil))))
+
+(add-hook 'kill-buffer-hook 'save-before-kill)
+(add-hook 'kill-emacs-hook 'save-before-kill)
