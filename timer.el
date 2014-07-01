@@ -161,7 +161,6 @@
             (let
               ((save-hash (make-hash-table))
                 (start (gethash :start timer)))
-              (puthash :name (gethash :name timer) save-hash)
               (puthash :time (+
                   (gethash :time timer 0)
                   (if start (- (float-time) start) 0))
